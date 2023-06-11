@@ -25,7 +25,7 @@ const getUserById = (req, res) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err.message === 'CastError') {
+      if (err.name === 'CastError') {
         res.status(ERROR_INCORRECT).send({
           message: 'Передан не существующий Id',
         });
@@ -54,7 +54,7 @@ const createUser = (req, res) => {
 
 const updateUserInfo = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, (name, about), {
+  User.findByIdAndUpdate(req.user._id, { name, about }, {
     new: true,
     runValidators: true,
   })
@@ -82,7 +82,7 @@ const updateUserInfo = (req, res) => {
 
 const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, (avatar), {
+  User.findByIdAndUpdate(req.user._id, { avatar }, {
     new: true,
     runValidators: true,
   })

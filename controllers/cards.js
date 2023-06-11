@@ -90,7 +90,7 @@ const dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(500).send({ message: 'Такой карточки не существует.' });
+        res.status(ERROR_NOT_FOUND).send({ message: 'Такой карточки не существует.' });
         return;
       }
       res.send({ data: card });
