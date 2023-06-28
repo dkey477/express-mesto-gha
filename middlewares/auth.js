@@ -1,17 +1,25 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const jwt = require('jsonwebtoken');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const auth = (req, res, next) => {
-  const token = req.cookies.jwt;
-  let payload;
+  const { autorization } = req.headers;
 
-  try {
-    payload = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (err) {
-    err.name = process.env.AU;
-    next(err);
+  if (!autorization || !autorization.startsWith('Bearer')) {
+    next(new UnauthorizedError('Авторизуйтесь'));
+    return;
   }
+  const token = autorization.replace('Bearer ', '');
+  let payload;
+  try {
+    payload = jwt.verify(token, 'secret-some');
+  } catch (err) {
+    next(new UnauthorizedError('Авторизуйтесь'));
+    return;
+  }
+
   req.user = payload;
+
   next();
 };
 
