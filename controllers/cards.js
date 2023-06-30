@@ -6,7 +6,7 @@ const BadRequestError = require('../errors/BadRequestError');
 
 const getCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.send(cards))
+    .then((cards) => res.send({ data: cards }))
     .catch(next);
 };
 

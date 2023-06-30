@@ -36,9 +36,7 @@ router.patch(
     body: Joi.object().keys({
       avatar: Joi.string()
         .required()
-        .pattern(
-          /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/,
-        ),
+        .pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
     }),
   }),
   updateUserAvatar,

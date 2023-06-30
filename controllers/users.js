@@ -8,23 +8,18 @@ const BadRequestError = require('../errors/BadRequestError');
 
 const getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.send(users))
+    .then((users) => res.send({ data: users }))
     .catch(next);
 };
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findUserByCredentials(email, password)
-    .select('+password')
+
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sing(
-        {
-          _id: user._id,
-        },
-        'some-secret',
-      );
+      const token = jwt.sign({ _id: user._id }, 'secret');
       res.cookie('jwt', token, {
-        maxAge: 360000,
+        maxAge: 3600000,
         httpOnly: true,
         sameSite: true,
       });
@@ -36,7 +31,7 @@ const login = (req, res, next) => {
 const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
-      if (user) return res.send({ data: user });
+      if (user) return res.send({ user });
       throw new NotFoundError('Пользователь не найден.');
     })
     .catch(next);
@@ -45,7 +40,7 @@ const getCurrentUser = (req, res, next) => {
 const getUserById = (req, res, next) => {
   User.findById(req.params.id)
     .then((user) => {
-      if (user) return res.send({ data: user });
+      if (user) return res.send({ user });
       throw new NotFoundError('Пользователь не найден.');
     })
     .catch(next);
@@ -64,7 +59,12 @@ const createUser = (req, res, next) => {
       about,
       avatar,
     }))
-    .then((user) => res.status(201).send(user))
+    .then((user) => {
+      const { _id } = user;
+      res.status(201).send({
+        email, name, about, avatar, _id,
+      });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные.'));
@@ -89,7 +89,7 @@ const updateUserInfo = (req, res, next) => {
     },
   )
     .then((user) => {
-      if (user) return res.send(user);
+      if (user) return res.send({ user });
       throw new NotFoundError('Пользователь не найден.');
     })
     .catch(next);
@@ -106,7 +106,7 @@ const updateUserAvatar = (req, res, next) => {
     },
   )
     .then((user) => {
-      if (user) return res.send(user);
+      if (user) return res.send({ user });
       throw new NotFoundError('Пользователь не найден.');
     })
     .catch(next);

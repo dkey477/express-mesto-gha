@@ -37,32 +37,26 @@ const userSchema = new mongoose.Schema({
       'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     required: true,
     validate: {
-      validator: (v) => /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/.test(v),
+      validator: (url) => /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/.test(url),
       message: 'Введите URL',
     },
   },
 });
 
-userSchema.static.findUserByCredentials = function findUserByCredentials(
-  email,
-  password,
-) {
+userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email })
     .select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(
-          new UnauthorizedError('Непправильная почта или пароль'),
-        );
+        return Promise.reject(new UnauthorizedError('Неправильная почта или пароль'));
       }
-      return bcrypt.compare(password, user.password).then((matched) => {
-        if (!matched) {
-          return Promise.reject(
-            new UnauthorizedError('Непправильная почта или пароль'),
-          );
-        }
-        return user;
-      });
+      return bcrypt.compare(password, user.password)
+        .then((mached) => {
+          if (!mached) {
+            return Promise.reject(new UnauthorizedError('Неправильная почта или пароль'));
+          }
+          return user;
+        });
     });
 };
 

@@ -1,25 +1,20 @@
+/* eslint-disable import/no-extraneous-dependencies */
 const express = require('express');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const mongoose = require('mongoose');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const { errors } = require('celebrate');
+const cookieParser = require('cookie-parser');
 const router = require('./routes/index');
 const errorCenter = require('./middlewares/errorCenter');
-const auth = require('./middlewares/auth');
 
 const app = express();
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
-
 app.use(express.json());
-
-app.use(auth);
-
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
+app.use(cookieParser());
 app.use(router);
 
-app.use(errorCenter);
-
 app.use(errors());
+app.use(errorCenter);
 
 app.listen(3000, () => {
   console.log('Слушаю порт 3000');

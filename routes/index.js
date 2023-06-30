@@ -4,8 +4,9 @@ const { celebrate, Joi } = require('celebrate');
 const userRoutes = require('./users');
 const cardRoutes = require('./cards');
 const { createUser, login } = require('../controllers/users');
+const auth = require('../middlewares/auth');
 
-router.post('/singup', celebrate({
+router.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
@@ -15,12 +16,14 @@ router.post('/singup', celebrate({
   }),
 }), createUser);
 
-router.post('/singin', celebrate({
+router.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }),
 }), login);
+
+router.use(auth);
 router.use('/users', userRoutes);
 router.use('/cards', cardRoutes);
 router.use('/*', (req, res) => {
