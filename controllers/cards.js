@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const Card = require('../models/card');
 const NotFoundError = require('../errors/NotFoundError');
-const ConflictRequestError = require('../errors/ConflictRequestError');
+const AccessIsDeniedError = require('../errors/AccessIsDeniedError');
 const BadRequestError = require('../errors/BadRequestError');
 
 const getCards = (req, res, next) => {
@@ -31,7 +31,7 @@ const deleteCard = (req, res, next) => {
         Card.deleteOne(card)
           .then((deletedCard) => res.send({ data: deletedCard }))
           .catch(next);
-      } else next(new ConflictRequestError('Нет прав на удаление'));
+      } else next(new AccessIsDeniedError('Нет прав на удаление'));
     })
     .catch(next);
 };
